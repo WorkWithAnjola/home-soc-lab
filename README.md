@@ -54,6 +54,7 @@ After multiple attempts, the install completed successfully with all three compo
 - Resource constrained VMs (6GB RAM) can cause install processes to fail unpredictably, patience and systematic log reading (`/var/log/wazuh-install.log`) were essential for diagnosing each failure, Wazuh's manager + agent cannot coexist on the same host in a standard install, a dedicated agent host is needed for full endpoint monitoring
 - ## Screenshot
 - ## Brute force SSH detection
-- ![Wazuh alert showing failed SSH login attemts] (wazuhbruteforcealert.png)
+- ![Wazuh alert showing failed SSH login attempts](wazuhbruteforcealert.png)
+
 
 - *Wazuh Discover view showing captured autentication failure events (rule.level 10) after a stimulated SSH brute force attempt from kali Linux.*
