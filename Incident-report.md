@@ -11,9 +11,9 @@
 Two SSH brute-force authentication attempts were executed against the `wazuhserver` host from `192.168.56.1`, targeting the local user account `anjyy`, approximately one hour apart on July 14, 2026.
 
 - **Attempt #1 (~21:30 UTC)** was **not detected** by Wazuh, despite being clearly visible in the system journal.
-- **Attempt #2 (~22:31 UTC)** was **successfully detected**, generating a high-severity alert (rule level 10) after 7 recorded hits.
+- **Attempt #2 (~22:31 UTC)** was **successfully detected**, generating a high severity alert (rule level 10) after 7 recorded hits.
 
-Root-cause analysis determined the missed detection on the first attempt was not a rule, decoder, or configuration failure — it was caused by the **Wazuh manager service not yet being active** at the time of the attack. The manager's `systemctl` status confirmed it had only started at 22:00:39 UTC, roughly 30 minutes *after* the first attack occurred. By the time the second attempt was run, the manager was fully running and correctly detected and escalated the activity.
+Root-cause analysis determined the missed detection on the first attempt was not a rule, decoder, or configuration failure. it was caused by the **Wazuh manager service not yet being active** at the time of the attack. The manager's `systemctl` status confirmed it had only started at 22:00:39 UTC, roughly 30 minutes *after* the first attack occurred. By the time the second attempt was run, the manager was fully running and correctly detected and escalated the activity.
 
 ---
 
@@ -31,7 +31,7 @@ Root-cause analysis determined the missed detection on the first attempt was not
 | 22:31:18 – 22:31:21 | Attempt #2: repeated failed SSH logins for `anjyy` from `192.168.56.1` | Wazuh Discover / `wazuh-alerts-*` |
 | 22:31:21 | **Alert generated** — rule level 10, "User missed the password more than one time," 7 total hits | Wazuh Discover |
 
-**Note:** Attempt #1 originated from a single SSH session (PID 5454) and source port (54503), indicating one persistent connection retrying credentials rather than a distributed or multi-connection automated tool (e.g., Hydra's default multi-socket behavior). This is a relevant detail for assessing attacker tooling/sophistication.
+**Note:** Attempt #1 originated from a single SSH session (PID 5454) and source port (54503), indicating one persistent connection retrying credentials rather than a distributed or multi-connection automated tool (e.g., Hydra's default multi socket behavior). This is a relevant detail for assessing attacker tooling/sophistication.
 
 ---
 
@@ -65,7 +65,7 @@ Root-cause analysis determined the missed detection on the first attempt was not
 
 ## 5. Key Finding: SIEM Detection Gap (Root Cause Confirmed)
 
-The first attack attempt (~21:30 UTC) was fully visible at the OS/journald level but produced **no alert in Wazuh**. Investigation initially considered several possibilities — decoder mismatches with `journald`-formatted logs, missing archive/full-log ingestion (`logall`), and agent enrollment issues — and ruled each one out systematically:
+The first attack attempt (~21:30 UTC) was fully visible at the OS/journald level but produced **no alert in Wazuh**. Investigation initially considered several possibilities decoder mismatches with `journald`-formatted logs, missing archive/full log ingestion (`logall`), and agent enrollment issues — and ruled each one out systematically:
 
 - The Wazuh agent (`wazuhserver`, ID 000) was confirmed active and locally enrolled.
 - `ossec.conf` had a `<localfile>` block correctly pointing to `journald` as a log source.
@@ -81,17 +81,17 @@ This is still a legitimate and common real-world SOC lesson: **a monitoring stac
 
 ## 6. Recommendations
 
-1. **Verify manager/service uptime before relying on detection coverage.** A simple `systemctl status wazuh-manager` check (or automated health check) should be part of any pre-exercise or pre-shift checklist in a SOC environment.
+1. **Verify manager/service uptime before relying on detection coverage.** A simple `systemctl status wazuh manager` check (or automated health check) should be part of any pre-exercise or pre-shift checklist in a SOC environment.
 2. **Enable archive logging** (`<logall>yes</logall>` and `<logall_json>yes</logall_json>` in `ossec.conf`) going forward, to retain all ingested events — not just alert-matched ones — which speeds up root-cause diagnosis for any future detection gaps.
-3. **Configure the Wazuh manager to start on boot** (`systemctl enable wazuh-manager`) to minimize windows where the host is exposed but unmonitored, especially in a lab environment where VMs are frequently powered on/off.
-4. **Implement active response** (e.g., Wazuh's `active-response` with `firewall-drop`) for repeated SSH authentication failures, to move from passive alerting to automated containment once detection is confirmed reliable.
-5. **Establish a monitoring "readiness check" habit** before any test or exercise — confirming the SIEM is not just installed but actively running and ingesting — rather than assuming an agent shown as "active" in enrollment means full coverage.
+3. **Configure the Wazuh manager to start on boot** (`systemctl enable wazuhmanager`) to minimize windows where the host is exposed but unmonitored, especially in a lab environment where VMs are frequently powered on/off.
+4. **Implement active response** (e.g., Wazuh's `active-response` with `firewall drop`) for repeated SSH authentication failures, to move from passive alerting to automated containment once detection is confirmed reliable.
+5. **Establish a monitoring "readiness check" habit** before any test or exercise confirming the SIEM is not just installed but actively running and ingesting rather than assuming an agent shown as "active" in enrollment means full coverage.
 
 ---
 
 ## 7. Lessons Learned
 
-The most valuable outcome of this investigation wasn't the second, successful detection — it was systematically ruling out configuration and decoder issues before finding the actual, much simpler root cause: the monitoring service itself wasn't running yet during the first attack window. This is a realistic and important SOC lesson: verifying a security tool is actually online and ready is a prerequisite to trusting its alerts, and detection gaps are sometimes operational rather than technical.
+The most valuable outcome of this investigation wasn't the second, successful detection, it was systematically ruling out configuration and decoder issues before finding the actual, much simpler root cause: the monitoring service itself wasn't running yet during the first attack window. This is a realistic and important SOC lesson: verifying a security tool is actually online and ready is a prerequisite to trusting its alerts, and detection gaps are sometimes operational rather than technical.
 
 ---
 
@@ -101,4 +101,4 @@ The screenshot below shows the attack from the Kali Linux side — a manual SSH 
 
 ![Kali attacker view of the SSH brute-force attempt](IMG_5222.jpeg)
 
-This confirms the attack was executed manually from a single terminal session — consistent with the single SSH session/source port observed server-side — rather than via an automated multi-connection tool (e.g., Hydra). This detail is relevant to assessing the simulated attacker's tooling and sophistication level.
+This confirms the attack was executed manually from a single terminal session consistent with the single SSH session/source port observed server side rather than via an automated multiconnection tool (e.g., Hydra). This detail is relevant to assessing the simulated attacker's tooling and sophistication level.
