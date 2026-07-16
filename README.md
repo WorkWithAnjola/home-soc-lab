@@ -52,6 +52,17 @@ After multiple attempts, the install completed successfully with all three compo
 - Host-only networks provide isolation but require a second adapter for internet access during setup
 - Default Ubuntu LVM partitioning doesn't always use the full allocated disk, always verify with `df -h`
 - Resource constrained VMs (6GB RAM) can cause install processes to fail unpredictably, patience and systematic log reading (`/var/log/wazuh-install.log`) were essential for diagnosing each failure, Wazuh's manager + agent cannot coexist on the same host in a standard install, a dedicated agent host is needed for full endpoint monitoring
+
+- ## Recommendations
+
+Beyond fixing this specific gap, a few practices would prevent this class of issue from recurring:
+
+- **Pre-flight health checks before any security exercise or shift handoff** — a 2-minute checklist confirming core services (SIEM manager, agents, log forwarding) are actually running, not just installed.
+- **Automated uptime/heartbeat monitoring for the SIEM itself** — ironically, a SIEM needs its own "who watches the watcher" alerting, so an outage in the monitoring layer doesn't go unnoticed until an actual incident exposes it.
+- **Runbook documentation for common failure modes** — turning this investigation into a reusable checklist means the next person who hits a "why didn't this alert fire" question can selfserve instead of rederiving the root cause from scratch.
+
+Small, boring, repeatable processes like these are usually what separates organizations that catch problems early from ones that only discover gaps after a real breach.
+
 - ## Screenshot
 - ## Brute force SSH detection
 - ![Wazuh alert showing failed SSH login attempts](IMG_5327.png)
