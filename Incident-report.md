@@ -99,6 +99,6 @@ The most valuable outcome of this investigation wasn't the second, successful de
 
 The screenshot below shows the attack from the Kali Linux side — a manual SSH connection attempt (`ssh anjyy@192.168.56.102`), host key acceptance, and 3 password attempts before the connection was rejected (`Permission denied (publickey,password)`).
 
-![Kali attacker view of the SSH brute-force attempt](screenshots/kali-ssh-attempt.jpeg)
+![Kali attacker view of the SSH brute-force attempt](IMG_5222.jpeg)
 
 This confirms the attack was executed manually from a single terminal session — consistent with the single SSH session/source port observed server-side — rather than via an automated multi-connection tool (e.g., Hydra). This detail is relevant to assessing the simulated attacker's tooling and sophistication level.
