@@ -71,3 +71,16 @@ Beyond fixing this specific gap, a few practices would prevent this class of iss
 
 Small, boring, repeatable processes like these are usually what separates organizations that catch problems early from ones that only discover gaps after a real breach.
 
+
+
+---
+
+## Bonus: IOC Parsing Script
+
+`parse_wazuh_alerts.py` is a small Python tool I wrote to speed up triage- it parses a raw Wazuh `alerts.json` file and summarizes top source IPs, targeted usernames, and alert types, with an option to filter by severity and export to CSV.
+
+Usage:
+\`\`\`
+python3 parse_wazuh_alerts.py alerts.json --min-level 7 --output summary.csv
+\`\`\`
+
